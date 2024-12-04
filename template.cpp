@@ -2,11 +2,12 @@
 #include <string>
 #include <fstream>
 #include <vector>
+#include <string.h>
 
 std::ifstream datafile;
 
 int main(int argc, char *argv[]) {
-    if(argc > 1 && (std::strcmp(argv[1], "-t") == 0 || std::strcmp(argv[1], "--test") == 0)) {
+    if(argc > 1 && (strcmp(argv[1], "-t") == 0 || strcmp(argv[1], "--test") == 0)) {
         std::cout << "TEST DATA\n\n";
         datafile.open("testdata.txt");
     }
