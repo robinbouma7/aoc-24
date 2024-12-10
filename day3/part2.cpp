@@ -33,20 +33,24 @@ int main(int argc, char *argv[]) {
                         i += 3;
                         enabled = true;
                     }
+                    else {
+                        continue;
+                    }
                 }
-                else if(line[i] == 'd' && line[i + 1] == 'o' && line[i + 2] == 'n' && line[i + 4] == 't' && line[i + 5] == '(' && line[i + 6] == ')') {
+                if(line[i] == 'd' && line[i + 1] == 'o' && line[i + 2] == 'n' && line[i + 3] == '\'' && line[i + 4] == 't' && line[i + 5] == '(' && line[i + 6] == ')') {
                     std::cout << "found don't()" << std::endl;
                     i += 6;
                     enabled = false;
+                    continue;
                 }
                 if(mulfound) {
                     if(isdigit(line[i])) {
-                        std::cout << "adding digit: " << line[i] << std::endl;
+                        //std::cout << "adding digit: " << line[i] << std::endl;
                         tempnum = (tempnum * 10) + line[i] - '0';
                     }
                     else if(line[i] == ',') {
                         if(num1 >= 0) {
-                            std::cout << ",error\n";
+                            //std::cout << ",error\n";
                             num1 = -1;
                             num2 = -1;
                             tempnum = 0;
@@ -59,13 +63,13 @@ int main(int argc, char *argv[]) {
                     }
                         
                     else if(line[i] == ')') {
-                        std::cout << "found ) " << std::endl;
+                        //std::cout << "found ) " << std::endl;
                         num2 = tempnum;
                         if(num1 >= 0 && num2 >= 0) {
-                            std::cout << "num1: " << num1 << " num2: " << num2 << std::endl;
+                            //std::cout << "num1: " << num1 << " num2: " << num2 << std::endl;
                             int oldresult = result;
                             result += num1 * num2;
-                            std::cout << "oldresult: " << oldresult << " newresult: " << result << std::endl;
+                            //std::cout << "oldresult: " << oldresult << " newresult: " << result << std::endl;
                             if(oldresult > result) {
                                 std::cout << "overflow" << std::endl;
                             }
@@ -83,7 +87,7 @@ int main(int argc, char *argv[]) {
                         }
                     }
                     else {
-                        std::cout << "message failed because of character: " << line[i] << std::endl;
+                        //std::cout << "message failed because of character: " << line[i] << std::endl;
                         num1 = -1;
                         num2 = -1;
                         tempnum = 0;
@@ -91,7 +95,7 @@ int main(int argc, char *argv[]) {
                     }
                 }
                 else if(line[i] == 'm' && line[i + 1] == 'u' && line[i + 2] == 'l' && line[i + 3] == '(') {
-                    std::cout << "found mul" << std::endl;
+                    //std::cout << "found mul" << std::endl;
                     i += 3;
                     mulfound = true;
                 }
