@@ -6,6 +6,61 @@
 
 std::ifstream datafile;
 
+std::vector<std::vector<int>> numbers;
+
+bool isvalid(std::vector<int> vec, int maxmistakes) {
+    bool increasing;
+    int mistakes = 0;
+    int lastwasmistake = false;
+    if(vec[0] > vec[1]) {
+       increasing = false;
+    }
+    else if(vec[0] < vec[1]) {
+        increasing = true;
+    }
+    else {
+        std::cout << "first two are the same" << std::endl;
+        return false;
+    }
+    int difference;
+    for(int i = 1; i < vec.size(); i++) {
+        if(lastwasmistake) {
+            lastwasmistake = false;
+            difference = vec[i] - vec[i - 2];
+        } 
+        else {
+            difference = vec[i] - vec[i - 1];
+        }
+        if(increasing) {
+            if(difference <= 0 || difference > 3) {
+                if(mistakes < maxmistakes) {
+                    mistakes++;
+                    lastwasmistake = true;
+                }
+                else {
+                    std::cout << "increase fail " << i << std::endl;
+                    std::cout << "difference: " << difference << std::endl;
+                    return false;
+                }
+            }
+        }
+        else {
+            if(difference >= 0 || difference < -3) {
+                if(mistakes < maxmistakes) {
+                    std::cout << "decrease fail " << i << std::endl;
+                    std::cout << "difference: " << difference << std::endl;
+                    mistakes++;
+                    lastwasmistake = true;
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
 int main(int argc, char *argv[]) {
     if(argc > 1 && (strcmp(argv[1], "-t") == 0 || strcmp(argv[1], "--test") == 0)) {
         std::cout << "TEST DATA\n\n";
@@ -21,11 +76,11 @@ int main(int argc, char *argv[]) {
             std::string line;
             getline(datafile, line);
             line = line + " ";
-            int lastnum = -1;
             int tempnum = 0;
             bool isvalid = true;
             int increasing = -1;
             int mistakes = 0;
+            std::vector<int> tempvec;
             //TODO: the mistake can be the second because it increases but the rest decreases. 
             //this does not account for that because it sets increasing with number 1 and 2.
             //maybe fix it by adding everything to a vector and creating a function that checks if its valid
@@ -35,95 +90,51 @@ int main(int argc, char *argv[]) {
                     tempnum = (tempnum * 10) + line[i] - '0';
                 }
                 else {
-                    if(lastnum < 0) {
-                        lastnum = tempnum;
+                    if(tempnum != 0) {
+                        tempvec.push_back(tempnum);
                         tempnum = 0;
-                        continue;
                     }
-                    else {
-                        if(increasing == -1) {
-                            if(tempnum - lastnum > 0 && tempnum - lastnum <= 3) {
-                                increasing = 1;
-                                //std::cout << "increasing " << tempnum - lastnum << std::endl;
-                                lastnum = tempnum;
-                                tempnum = 0;
-                            }
-                            else if(tempnum - lastnum < 0 && tempnum - lastnum >= -3) {
-                                increasing = 0;
-                                //std::cout << "decreasing" << tempnum - lastnum << std::endl;
-                                lastnum = tempnum;
-                                tempnum = 0;
-                            }
-                            else {
-                                if(mistakes == 0) {
-                                    mistakes++;
-                                    tempnum = 0;
-                                    continue;
-                                }
-                                else {
-                                    isvalid = false;
-                                    break;
-                                }
-                            }
-                        }
-                        else if(increasing == 0) {
-                            if(tempnum - lastnum < 0 && tempnum - lastnum >= -3) {
-                                //std::cout << "decreasing " << tempnum - lastnum << std::endl;
-                                lastnum = tempnum;
-                                tempnum = 0;
-                                continue;
-                            }
-                            else {
-                                //std::cout << "decrease test: " << lastnum << " " << tempnum << std::endl;
-                                //std::cout << tempnum - lastnum << std::endl;
-                                if(mistakes == 0) {
-                                    mistakes++;
-                                    tempnum = 0;
-                                    continue;
-                                }
-                                else {
-                                    isvalid = false;
-                                    break;
-                                }
-                            }
-                        }
-                        else if(increasing == 1) {
-                            if(tempnum - lastnum > 0 && tempnum - lastnum <= 3) {
-                                //std::cout << "increasing " << tempnum - lastnum << std::endl;
-                                lastnum = tempnum;
-                                tempnum = 0;
-                                continue;
-                            }
-                            else {
-                                //std::cout << "increase test: " << lastnum << " " << tempnum << std::endl;
-                                //std::cout << tempnum - lastnum << std::endl;
-                                if(mistakes == 0) {
-                                    mistakes++;
-                                    tempnum = 0;
-                                    continue;
-                                }
-                                else {
-                                    isvalid = false;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                   
                 }
             }
-
-            if(isvalid) {
-                std::cout << "valid: " << line << std::endl;
+            numbers.push_back(tempvec);        
+        }
+        for(int i = 0; i < numbers.size(); i++) {
+            
+            if(isvalid(numbers[i], 1)) {
+                std::cout << i << " is valid" << std::endl;
                 validcount++;
+                continue;
             }
             else {
-                std::cout << "invalid: " << line << std::endl;
+                for(int j = 0; j < numbers[i].size(); j++) {
+                    std::vector<int> tempvec = numbers[i];
+                    tempvec.erase(tempvec.begin() + j);
+                    if(isvalid(tempvec, 0)) {
+                        std::cout << i << " is valid by removing " << j << std::endl;
+                        validcount++;
+                        break;
+                    }
+                }
+                /*std::vector<int> tempvec = numbers[i];
+                tempvec.erase(tempvec.begin());
+                if(isvalid(tempvec, 0)) {
+                    std::cout << i << " is valid by removing 1" << std::endl;
+                    validcount++;
+                    continue;
+                }
+                else {
+                    tempvec = numbers[i];
+                    tempvec.erase(tempvec.begin() + 1);
+                    if(isvalid(tempvec, 0)) {
+                        std::cout << i << " is valid by removing 2" << std::endl;
+                        validcount++;
+                        continue;
+                    }
+                }*/
             }
-        
-           
+            
         }
-         std::cout << "result: " << validcount << std::endl;
+        std::cout << "result: " << validcount << std::endl;
     }
     return 0;
 }
